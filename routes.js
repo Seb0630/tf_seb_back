@@ -35,7 +35,7 @@ app.post("/add_dot", async (request, response) => {
       
       response.send(dot);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -54,7 +54,7 @@ app.post("/delete", async (request, response) => {
       });
       
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -72,7 +72,7 @@ app.post("/delete_targets", async (request, response) => {
         }
       });
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -91,7 +91,7 @@ app.get("/dots", async (request, response) => {
 
     response.send(dots_with_advice);
   } catch (error) {
-    response.status(500).send(error);
+  //  response.status(500).send(error);
   }
 });
 
@@ -103,7 +103,7 @@ app.get("/advices", async (request, response) => {
     const advices = await Advice.find({scenario_id : scenario_id}).select({}).sort({"advice_id" : -1});
     response.send(advices);
   } catch (error) {
-    response.status(500).send(error);
+  //  response.status(500).send(error);
   }
 });
 
@@ -120,7 +120,7 @@ app.post("/add_advice", async (request, response) => {
       
       response.send(advice);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -131,17 +131,17 @@ app.post("/delete_advice", async (request, response) => {
 
     try {
       await Dot.deleteMany(query); 
-      await Advice.findOneAndDelete({ advice_id: advice_id }, function (err, docs) {
+      await Advice.findOneAndDelete({ advice_id: parseInt(advice_id) }, function (err, docs) {
         if (err){
-            console.log(err)
+          console.log(err);
         }
         else{
           response.sendStatus(200);
         }
       });
-      
+     
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -154,7 +154,7 @@ app.get("/spectrums", async (request, response) => {
     const spectrums = await Spectrum.find({scenario_id : scenario_id}).select({}).sort({"row_id" : -1});
     response.send(spectrums);
   } catch (error) {
-    response.status(500).send(error);
+  //  response.status(500).send(error);
   }
 });
 
@@ -180,7 +180,7 @@ app.post("/add_spectrum", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -198,7 +198,7 @@ app.post("/update_spectrum_title", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -222,7 +222,7 @@ app.post("/update_spectrum_labels", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -235,16 +235,15 @@ app.post("/delete_spectrum", async (request, response) => {
       await Dot.deleteMany(query); 
       await Spectrum.findOneAndDelete({ row_id: row_id }, function (err, docs) {
           if (err){
-            console.log(err)
+            console.log(err);
           }
           else{
-            
             response.sendStatus(200);
           }
       });
       
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
@@ -252,10 +251,10 @@ app.post("/delete_spectrum", async (request, response) => {
 
 app.get("/scenarios", async (request, response) => {
   try {
-    const scenarios = await Scenario.find({}).select({}).sort({"scenario_id" : -1});
+    const scenarios = await Scenario.find({}).lean().sort({"scenario_id" : -1});
     response.send(scenarios);
   } catch (error) {
-    response.status(500).send(error);
+  //  response.status(500).send(error);
   }
 });
 
@@ -276,7 +275,7 @@ app.post("/add_scenario", async (request, response) => {
       
       response.send(scenario);
     } catch (error) {
-      response.status(500).send(error);
+    //  response.status(500).send(error);
     }
 });
 
