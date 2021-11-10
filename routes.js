@@ -111,9 +111,10 @@ app.post("/add_advice", async (request, response) => {
     try {
       let req = request.body;
       const advice_id = req.advice_id;
+      const scenario_id = req.scenario_id;
       const update = { advice_content : req.advice_content, scenario_id :  req.scenario_id, advice_color : req.advice_color, eda_value: req.eda_value};
 
-      let advice = await Advice.findOneAndUpdate({advice_id : advice_id}, update, {
+      let advice = await Advice.findOneAndUpdate({advice_id : advice_id, scenario_id : scenario_id }, update, {
         new: true,
         upsert: true // Make this update into an upsert
       });
@@ -130,7 +131,7 @@ app.post('/update_advices', async (request, response) => {
     let advices = req.advices;
     let bulk = await Advice.collection.initializeOrderedBulkOp();
     advices.forEach(function(advice){
-        bulk.find( {advice_id : advice.advice_id } ).update({$set: { eda_value : advice.eda_value } });
+        bulk.find( {advice_id : advice.advice_id, scenario_id : advice.scenario_id } ).update({$set: { eda_value : advice.eda_value } });
     });
     bulk.execute(function(err) {
       response.sendStatus(200);
