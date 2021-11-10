@@ -148,7 +148,7 @@ app.post("/delete_advice", async (request, response) => {
 
     try {
       await Dot.deleteMany(query); 
-      await Advice.findOneAndDelete({ advice_id: parseInt(advice_id), scenario_id : parseInt(scenario_id) }, function (err, docs) {
+      await Advice.deleteOne({ advice_id: parseInt(advice_id), scenario_id : parseInt(scenario_id) }, function (err, docs) {
         if (err){
           console.log(err);
         }
