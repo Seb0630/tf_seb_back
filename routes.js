@@ -28,7 +28,7 @@ app.post("/add_dot", async (request, response) => {
         scenario_id : req.scenario_id 
       };
 
-      let dot = await Dot.findOneAndUpdate({id : dot_id}, update, {
+      let dot = await Dot.findOneAndUpdate({id : dot_id, scenario_id : req.scenario_id}, update, {
         new: true,
         upsert: true // Make this update into an upsert
       });
@@ -44,33 +44,16 @@ app.post("/delete", async (request, response) => {
     const dot_id = req.id; // get dot_id from req
 
     try {
-      await Dot.findOneAndDelete({ id: dot_id }, function (err, docs) {
+      await Dot.deleteOne({ id: dot_id, scenario_id : req.scenario_id }, function (err, docs) {
           if (err){
               console.log(err)
           }
           else{
+            console.log(docs);
             response.sendStatus(200);
           }
       });
       
-    } catch (error) {
-    //  response.status(500).send(error);
-    }
-});
-
-app.post("/delete_targets", async (request, response) => {
-    let req = request.body;
-    const advice_id = req.advice_id; // get dot_id from req
-
-    try {
-      await Dot.deleteMany({ color: "blue", advice_id : advice_id }, function(err, obj){
-        if (err){
-            console.log(err)
-        }
-        else{
-          response.sendStatus(200);
-        }
-      });
     } catch (error) {
     //  response.status(500).send(error);
     }
