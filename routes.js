@@ -143,11 +143,12 @@ app.post('/update_advices', async (request, response) => {
 app.post("/delete_advice", async (request, response) => {
     let req = request.body;
     const advice_id = req.advice_id; // get advice_id from req
+    const scenario_id = req.scenario_id;
     const query = { advice_id: advice_id };
 
     try {
       await Dot.deleteMany(query); 
-      await Advice.findOneAndDelete({ advice_id: parseInt(advice_id) }, function (err, docs) {
+      await Advice.findOneAndDelete({ advice_id: parseInt(advice_id), scenario_id : parseInt(scenario_id) }, function (err, docs) {
         if (err){
           console.log(err);
         }
