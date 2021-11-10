@@ -17,7 +17,8 @@ const mongo_uri = process.env.MONGO_URI; // this variable is set in .env file
 mongoose.connect(
   mongo_uri,{
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
   }
 );
 
