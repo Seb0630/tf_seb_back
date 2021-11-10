@@ -103,7 +103,12 @@ exports.create = async function(req, res) {
             res.send(result);
         }
         else{
-            const result_google = await axios(options_google);
+            try {
+                const result_google = await axios(options_google);
+            } catch(err){
+                throw new Error(err.message);
+            }
+            
             const result_wiki = await axios(options_wiki);
             
             const keywords_ = await Stats.find({},{word : 1}).lean();
@@ -197,7 +202,7 @@ exports.create = async function(req, res) {
         }
      
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };
 
@@ -213,6 +218,6 @@ exports.delete = async function(req, res) {
       });
       
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };

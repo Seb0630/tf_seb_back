@@ -100,10 +100,10 @@ app.get("/advices", async (request, response) => {
   const scenario_id = request.query.scenario_id;
   
   try {
-    const advices = await Advice.find({scenario_id : scenario_id}).select({}).sort({"advice_id" : -1});
+    const advices = await Advice.find({scenario_id : scenario_id}).select({}).sort({"eda_value" : -1});
     response.send(advices);
   } catch (error) {
-  //  response.status(500).send(error);
+    throw new Error(error.message);
   }
 });
 
@@ -111,7 +111,7 @@ app.post("/add_advice", async (request, response) => {
     try {
       let req = request.body;
       const advice_id = req.advice_id;
-      const update = { advice_content : req.advice_content, scenario_id :  req.scenario_id, advice_color : req.advice_color};
+      const update = { advice_content : req.advice_content, scenario_id :  req.scenario_id, advice_color : req.advice_color, eda_value: req.eda_value};
 
       let advice = await Advice.findOneAndUpdate({advice_id : advice_id}, update, {
         new: true,
@@ -120,8 +120,24 @@ app.post("/add_advice", async (request, response) => {
       
       response.send(advice);
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
+});
+
+app.post('/update_advices', async (request, response) => {
+  try {
+    let req = request.body;
+    let advices = req.advices;
+    let bulk = await Advice.collection.initializeOrderedBulkOp();
+    advices.forEach(function(advice){
+        bulk.find( {advice_id : advice.advice_id } ).update({$set: { eda_value : advice.eda_value } });
+    });
+    bulk.execute(function(err) {
+      response.sendStatus(200);
+    });
+  } catch (error) {
+    throw new Error(error.message);
+  }
 });
 
 app.post("/delete_advice", async (request, response) => {
@@ -141,7 +157,7 @@ app.post("/delete_advice", async (request, response) => {
       });
      
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 
@@ -154,7 +170,7 @@ app.get("/spectrums", async (request, response) => {
     const spectrums = await Spectrum.find({scenario_id : scenario_id}).select({}).sort({"row_id" : -1});
     response.send(spectrums);
   } catch (error) {
-  //  response.status(500).send(error);
+    throw new Error(error.message);
   }
 });
 
@@ -180,7 +196,7 @@ app.post("/add_spectrum", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 
@@ -198,7 +214,7 @@ app.post("/update_spectrum_title", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 
@@ -222,7 +238,7 @@ app.post("/update_spectrum_labels", async (request, response) => {
       
       response.send(spectrum);
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 
@@ -243,7 +259,7 @@ app.post("/delete_spectrum", async (request, response) => {
       });
       
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 
@@ -254,7 +270,7 @@ app.get("/scenarios", async (request, response) => {
     const scenarios = await Scenario.find({}).lean().sort({"scenario_id" : -1});
     response.send(scenarios);
   } catch (error) {
-  //  response.status(500).send(error);
+    throw new Error(error.message);
   }
 });
 
@@ -275,7 +291,7 @@ app.post("/add_scenario", async (request, response) => {
       
       response.send(scenario);
     } catch (error) {
-    //  response.status(500).send(error);
+      throw new Error(error.message);
     }
 });
 

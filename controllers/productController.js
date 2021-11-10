@@ -8,7 +8,7 @@ exports.products = async function(req, res) {
         const products = await Product.find({}).select({});
         res.send(products);
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };
 
@@ -18,7 +18,7 @@ exports.product = async function(req, res) {
         const product = products.find((_product) => changeCase.paramCase(_product.name) === req.params.name);
         res.send(product);
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };
 
@@ -39,7 +39,7 @@ exports.create = async function(req, res) {
 
         res.send(product);
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };
 
@@ -50,7 +50,7 @@ exports.edit = async function(req, res) {
         });
         res.send(product);
     } catch (error) {
-        res.status(500).send(error);
+        throw new Error(error.message);
     }
 };
 
