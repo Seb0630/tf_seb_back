@@ -49,7 +49,6 @@ app.post("/delete", async (request, response) => {
               console.log(err)
           }
           else{
-            console.log(docs);
             response.sendStatus(200);
           }
       });
@@ -280,12 +279,25 @@ app.post("/add_scenario", async (request, response) => {
     }
 });
 
-//
+// product route
 var product  = require('./routes/products');
-app.use('/product',product);
+app.use('/product', product);
 
+// muse route
 var muse  = require('./routes/muse');
-app.use('/muse',muse);
+app.use('/muse', muse);
+
+// tool route
+var tool  = require('./routes/tool');
+app.use('/tool', tool);
+
+// question route
+var question = require('./routes/question');
+app.use('/question', question);
+
+// spectrum route
+var spectrum = require('./routes/spectrum');
+app.use('/spectrum', spectrum);
 
 module.exports = app;
 
