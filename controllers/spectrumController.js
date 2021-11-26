@@ -1,4 +1,6 @@
 const SpectrumCloneV1 = require('../models/clone_v1/model_spectrum');
+const Question = require('../models/clone_v1/model_question');
+const AdviceCloneV1 = require('../models/clone_v1/model_advice');
 
 // Display list of all products.
 exports.spectrums = async function(req, res) {
@@ -36,6 +38,12 @@ exports.create = async function(req, res) {
 
 exports.delete = async function(req, res) {
     try {
+        await Question.updateMany({toolId: req.body.toolId },
+            { $pull: { "options.$[].links": { spectrumId : req.body.spectrumId } } }, { multi: true });
+        
+        await AdviceCloneV1.updateMany({toolId: req.body.toolId },
+            { $pull: { "links": { spectrumId : req.body.spectrumId } } }, { multi: true });
+
         await SpectrumCloneV1.deleteOne({spectrumId : req.body.spectrumId, toolId: req.body.toolId }, function (err, docs) {
             if (err){
                 console.log(err)

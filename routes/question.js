@@ -8,5 +8,6 @@ router.post('/questions', question_controller.questions);
 router.post('/create', question_controller.create);
 router.post('/delete', question_controller.delete);
 router.post('/reorder', question_controller.reorder);
+router.post('/setnonelinks', question_controller.setnonelinks);
 
 module.exports = router;

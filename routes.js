@@ -299,5 +299,9 @@ app.use('/question', question);
 var spectrum = require('./routes/spectrum');
 app.use('/spectrum', spectrum);
 
+// advice route
+var advice = require('./routes/advice');
+app.use('/advice', advice);
+
 module.exports = app;
 

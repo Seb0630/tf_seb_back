@@ -61,3 +61,69 @@ exports.reorder =  async function(req, res) {
         throw new Error(error.message);
     }
 };
+
+exports.setnonelinks = async function(req, res) {
+    try {
+       const spectrumIds = req.body.spectrumIds;
+       const toolId = req.body.toolId;
+       const questionIds = req.body.questionIds;
+
+        let bulk = await Question.collection.initializeOrderedBulkOp();
+        
+        // questionIds.forEach(function(questionId){
+        //     spectrumIds.forEach(function(spectrumId){
+        //         bulk.find( { toolId : toolId, questionId : questionId}).
+        //         update(
+        //             { 
+        //             $addToSet: { "options.$[].links" : {
+        //             spectrumId : spectrumId, 
+        //             size : 'small', 
+        //             value : null, 
+        //             color : 'green'} }},
+        //         {  multi : true } );
+        //     })
+        // })
+
+        await Question.find({toolId: req.body.toolId }).update(
+            {   $set: { "options.$[].links.$[i]": {
+                             spectrumId : 10, 
+                             size : 'small', 
+                             value : null, 
+                             color : '12'} }}, {upsert: true, arrayFilters : [ { "i.spectrumId": 10 } ]});
+
+        // questionIds.forEach(function(questionId){
+        //     spectrumIds.forEach(function(spectrumId){
+        //         bulk.find( { toolId : toolId, questionId : questionId}).
+        //         update(
+        //             {   $set: { "options.$[].links.$[i]": {
+        //                              spectrumId : spectrumId, 
+        //                              size : 'small', 
+        //                              value : null, 
+        //                              color : '12efefe'} }}, {upsert: true, arrayFilters : [ { "i.spectrumId": spectrumId } ]});
+        //     })
+        // })
+      
+        // bulk.execute(async function(err) {
+        //     res.sendStatus(200);
+        // });
+
+        // let ttt = spectrumIds.map((spectrumId, i) => ({
+            
+        //         updateOne: {
+        //             filter: {toolId : toolId, questionId : 2},
+        //             update: {$set: { "options.$[].links.$[i].color" : 'ee'}},
+        //             arrayFilters: [  { "i.spectrumId": spectrumId } ],
+        //             upsert: true
+        //         }
+           
+        // }))
+
+        // await Question.collection.bulkWrite(ttt).catch(e => {
+        //     console.log(e);
+        
+        //  });
+
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
