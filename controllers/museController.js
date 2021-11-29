@@ -103,12 +103,8 @@ exports.create = async function(req, res) {
             res.send(result);
         }
         else{
-            try {
-                const result_google = await axios(options_google);
-            } catch(err){
-                throw new Error(err.message);
-            }
             
+            const result_google = await axios(options_google);
             const result_wiki = await axios(options_wiki);
             
             const keywords_ = await Stats.find({},{word : 1}).lean();

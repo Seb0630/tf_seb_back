@@ -62,6 +62,32 @@ exports.reorder =  async function(req, res) {
     }
 };
 
+exports.dots = async function(req, res) {
+    try {
+        const questions = await Question.find(
+            {toolId : req.body.toolId, options : {$elemMatch : { links : { $exists: true, $ne: [] } }}}, 
+            {_id : 0}).select({options : 1, questionId : 1}).lean(); 
+        
+        const result = questions.map(q => {
+            const options = q.options;
+            return options.map(option => {
+
+                // return option.links.filter(link => link.value !== null)
+                return {
+                    questionId : q.questionId,
+                    optionId : option.optionId,
+                    links : option.links.filter(link => link.value !== null)
+                };
+            });
+        })
+
+        res.send(result);
+       
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 exports.setnonelinks = async function(req, res) {
     try {
        const spectrumIds = req.body.spectrumIds;
@@ -75,7 +101,7 @@ exports.setnonelinks = async function(req, res) {
         //         bulk.find( { toolId : toolId, questionId : questionId}).
         //         update(
         //             { 
-        //             $addToSet: { "options.$[].links" : {
+        //             $set: { "options.$[].links" : {
         //             spectrumId : spectrumId, 
         //             size : 'small', 
         //             value : null, 
@@ -84,28 +110,31 @@ exports.setnonelinks = async function(req, res) {
         //     })
         // })
 
-        await Question.find({toolId: req.body.toolId }).update(
-            {   $set: { "options.$[].links.$[i]": {
-                             spectrumId : 10, 
-                             size : 'small', 
-                             value : null, 
-                             color : '12'} }}, {upsert: true, arrayFilters : [ { "i.spectrumId": 10 } ]});
+        // await Question.updateMany(
+        //     {toolId: req.body.toolId},
+        //     {   
+        //         $set: { 
+        //             "options.$[].links.$[i].color": 'green'
+        //         }
+        //     }, 
+        //     { arrayFilters : [ { "i.color": 'red' } ]}
+        // );
 
-        // questionIds.forEach(function(questionId){
-        //     spectrumIds.forEach(function(spectrumId){
-        //         bulk.find( { toolId : toolId, questionId : questionId}).
-        //         update(
-        //             {   $set: { "options.$[].links.$[i]": {
-        //                              spectrumId : spectrumId, 
-        //                              size : 'small', 
-        //                              value : null, 
-        //                              color : '12efefe'} }}, {upsert: true, arrayFilters : [ { "i.spectrumId": spectrumId } ]});
-        //     })
-        // })
+        
+        spectrumIds.forEach(function(spectrumId){
+            bulk.find( { toolId : toolId}).
+            update(
+                {   $set: { "options.$[].links.$[i]": {
+                                    spectrumId : spectrumId, 
+                                    size : 'small', 
+                                    value : null, 
+                                    color : 'red'} }}, {upsert: true, arrayFilters : [ { "i.spectrumId": spectrumId } ]});
+        })
+       
       
-        // bulk.execute(async function(err) {
-        //     res.sendStatus(200);
-        // });
+        bulk.execute(async function(err) {
+            res.sendStatus(200);
+        });
 
         // let ttt = spectrumIds.map((spectrumId, i) => ({
             
@@ -121,7 +150,7 @@ exports.setnonelinks = async function(req, res) {
         // await Question.collection.bulkWrite(ttt).catch(e => {
         //     console.log(e);
         
-        //  });
+        // });
 
     } catch (error) {
         throw new Error(error.message);
