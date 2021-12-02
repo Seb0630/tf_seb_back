@@ -1,4 +1,5 @@
 const Question = require('../models/clone_v1/model_question');
+const AdviceCloneV1 = require('../models/clone_v1/model_advice');
 
 // Display list of all products.
 exports.questions = async function(req, res) {
@@ -68,18 +69,35 @@ exports.dots = async function(req, res) {
             {toolId : req.body.toolId, options : {$elemMatch : { links : { $exists: true, $ne: [] } }}}, 
             {_id : 0}).select({options : 1, questionId : 1}).lean(); 
         
-        const result = questions.map(q => {
-            const options = q.options;
-            return options.map(option => {
+        const advices = await AdviceCloneV1.find(
+            {toolId : req.body.toolId,   links : { $exists: true, $ne: []  }}, 
+            {_id : 0}).select({links : 1, adviceId : 1, title : 1}).lean(); 
 
-                // return option.links.filter(link => link.value !== null)
-                return {
-                    questionId : q.questionId,
-                    optionId : option.optionId,
-                    links : option.links.filter(link => link.value !== null)
-                };
-            });
-        })
+        
+        const _adviceTargets = advices.map(a => (
+            a.links?.filter(link => link.position !== null).map(ele => ({...ele, adviceTitle: a.title, adviceId: a.adviceId}))
+        ))
+
+        const targets = [].concat.apply([],Object.values(_adviceTargets));
+        
+        const dots = [];
+        questions.map(q => (
+            q.options.map(option => {
+                const dot = option.links?.filter(link => link.value !== null).map(ele => ({...ele,  questionId : q.questionId,
+                    optionId : option.optionId}))
+                if((dot !== null) && (typeof dot !== 'undefined')){
+                    dots.push(dot);
+                }
+                return dot;
+            })
+        ))
+             
+        const dot_array = [].concat.apply([], Object.values(dots));
+                    
+        let result = {
+            targets : targets,
+            dots :  dot_array
+        }
 
         res.send(result);
        

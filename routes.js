@@ -303,5 +303,9 @@ app.use('/spectrum', spectrum);
 var advice = require('./routes/advice');
 app.use('/advice', advice);
 
+// selection route
+var selection = require('./routes/selection');
+app.use('/selection', selection);
+
 module.exports = app;
 
