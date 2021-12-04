@@ -83,7 +83,7 @@ exports.create = async function(req, res) {
         // GOOGLE BOOKS MODE
         var options_google = {
             'method': 'GET',
-            'url': 'https://api.datamuse.com/words?ml=' + keyword + '&max=1000',
+            'url': encodeURI('https://api.datamuse.com/words?ml=' + keyword + '&max=1000'),
             'headers': {
                 'Content-Type': 'application/json'
             }
@@ -91,7 +91,7 @@ exports.create = async function(req, res) {
         // WIKIPEDIA MODE
         var options_wiki = {
             'method': 'GET',
-            'url': 'https://api.datamuse.com/words?ml=' + keyword + '&v=enwiki&max=1000',
+            'url': encodeURI('https://api.datamuse.com/words?ml=' + keyword + '&v=enwiki&max=1000'),
             'headers': {
                 'Content-Type': 'application/json'
             }
