@@ -103,12 +103,8 @@ exports.create = async function(req, res) {
             res.send(result);
         }
         else{
-            
             const result_google = await axios(options_google);
             const result_wiki = await axios(options_wiki);
-            
-            const keywords_ = await Stats.find({},{word : 1}).lean();
-            const keywords = keywords_.map(w => w.word);
 
             const google_words = result_google.data.map(w => w.word);
             const wiki_words   = result_wiki.data.map(w => w.word);
@@ -121,19 +117,21 @@ exports.create = async function(req, res) {
             });
             const wordSaved = await newWord.save();
 
+
             const google_words_info = result_google.data.map((w,i) => ({word : w.word, google_score : w.score, position: i}));
             const wiki_words_info   = result_wiki.data.map((w,i) => ({word : w.word, wiki_score : w.score, position: i}));
 
             // non-duplicate words after merging google words and wiki words(words from new datamuse API calls) - Array B
             let mergedWords = [...new Set([...google_words, ...wiki_words])]; 
-
+            // console.time('time to get intersection');
+            // console.log("mergedWords length: " + mergedWords.length);
             // Intersection words between  Array A and Array B
-            let intersection_words = mergedWords.filter(x => keywords.includes(x));
-
+            let intersection_words = await Stats.find({word : { $in: mergedWords }}).select({word :1, _id : 0}).distinct('word').lean()
+         //   console.timeEnd('time to get intersection');
             //The difference will output the elements from array A that are not in the array B.
             // difference words
-            let difference_words = mergedWords.filter(x => !keywords.includes(x));
-            
+            let difference_words = mergedWords.filter(x => !intersection_words.includes(x));
+
             let newRecords = [];
             difference_words.forEach(function(word){
                 let sum_position = 0;

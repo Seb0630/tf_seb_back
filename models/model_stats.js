@@ -11,7 +11,7 @@ const StatsSchema = new mongoose.Schema({
     default : 0
   }
 });
-
+StatsSchema.index({ word: 1 });    //---Index----
 const Stats = mongoose.model("Stats", StatsSchema);
 // create Stats model from Stats schema
 
