@@ -6,24 +6,95 @@ const Stats = require('../models/model_stats');
 // Display list of all words.
 exports.words = async function(req, res) {
     try {
-        const words = await Word.find({}, { _id: 0, wordContent: 1 });
-        const words_array = words.map(w => w.wordContent);
-        const ms = await Stats.find({}).lean();
+        const pageNumber = req.body.pageNumber;
+        const isIndexed = req.body.isIndexed;
+        const firstLetter = req.body.firstLetter;
+
+        const words = await Word.find({}, { _id: 0, wordContent: 1 }).lean();
+        const wordsIndexed = words.map(w => w.wordContent);
+
+        let ms = [];
+        let filter = {};
+        if(pageNumber === 0){
+            if(isIndexed){
+                if(firstLetter !== ''){
+                    filter = {
+                        word : {$in : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        count : {$gte : 3}
+                    };
+                }
+                else{
+                    filter = {
+                        word : {$in : wordsIndexed}, 
+                        count : {$gte : 3}
+                    };
+                }
+            }
+            else{
+                if(firstLetter !== ''){
+                    filter = {
+                        word : {$nin : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        count : {$gte : 3}
+                    };
+                }
+                else{
+                    filter = {
+                        word : {$nin : wordsIndexed}, 
+                        count : {$gte : 3}
+                    };
+                }
+            }
+
+            ms = await Stats.find(filter).skip( 1000 * pageNumber).limit(1000).sort({count: -1}).lean();
+        }
+        else{
+            if(isIndexed){
+                if(firstLetter !== ''){
+                    filter = {
+                        word : {$in : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        count : {$gte : 3}
+                    };
+                }
+                else{
+                    filter = {
+                        word : {$in : wordsIndexed}, 
+                        count : {$gte : 3}
+                    }; 
+                }
+            }
+            else{
+                if(firstLetter !== ''){
+                    filter = {
+                        word : {$nin : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        count : {$gte : 3}
+                    };
+                }
+                else{
+                    filter = {
+                        word : {$nin : wordsIndexed}, 
+                        count : {$gte : 3}
+                    }; 
+                }
+           
+            }
+            ms = await Stats.find(filter).skip( 1000 * pageNumber).skip(1000 * pageNumber).limit(1000).sort({count: -1}).lean();
+        }
         
         let result = ms.map(function(entry){
-            const isIndexed = words_array.includes(entry.word)? "Yes" : '';
             let record = {
                 'count' : entry.count,
-                'power' :  parseInt(entry.sum_pos / entry.count),
-                'score' : Number((entry.count + entry.count * (1000 - parseInt(entry.sum_pos / entry.count)) / 1000).toFixed(2)),
-                'indexed' : isIndexed,
+                'indexed' : isIndexed? "Yes" : "",
                 'word' : entry.word
             }
             return record;
         });
         
-        result.sort((a, b) => parseInt(b.score) - parseInt(a.score));
-        res.send(result);
+        let res_obj = {
+            totalCount : result.length,
+            rows : result
+        };
+
+        res.send(res_obj);
         
     } catch (error) {
         res.status(500).send(error);
