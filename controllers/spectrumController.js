@@ -12,6 +12,78 @@ exports.spectrums = async function(req, res) {
     }
 };
 
+exports.labels = async function(req, res) {
+    try {
+        const label_obj_array = await SpectrumCloneV1.find(
+            { toolId : req.body.toolId}, 
+            { 
+                _id : 0, 
+                __v : 0, 
+                content : 0, 
+               toolId : 0
+            }).lean();
+
+        let labels = [];
+        label_obj_array.map(label_obj => {
+            let labels_spectrum = Object.values(label_obj);
+            labels_spectrum.shift();
+     
+            labels_spectrum.map((entry, i) => {
+                let label_node = null;
+                if(i === 0){
+                    label_node = {
+                        spectrumId : label_obj.spectrumId,
+                        label : entry,
+                        position : 0,
+                        formattedLabel : entry + " (0)"
+                    }
+                }
+                if(i === 1){
+                    label_node = {
+                        spectrumId : label_obj.spectrumId,
+                        label : entry,
+                        position : -100,
+                        formattedLabel : entry + " (-100)"
+                    }
+                }
+                if(i === 2){
+                    label_node = {
+                        spectrumId : label_obj.spectrumId,
+                        label : entry,
+                        position : -50,
+                        formattedLabel : entry + " (-50)"
+                    }
+                }
+                if(i === 3){
+                    label_node = {
+                        spectrumId : label_obj.spectrumId,
+                        label : entry,
+                        position : 100,
+                        formattedLabel : entry + " (100)"
+                    }
+                }
+                if(i === 4){
+                    label_node = {
+                        spectrumId : label_obj.spectrumId,
+                        label : entry,
+                        position : 50,
+                        formattedLabel : entry + " (50)"
+                    }
+                }
+
+                if(label_node.label !== ""){
+                    labels.push(label_node);
+                }
+                
+            })
+        });
+        
+        res.send(labels);
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 exports.create = async function(req, res) {
     try {
         let update = {
@@ -28,7 +100,7 @@ exports.create = async function(req, res) {
         let spectrum = await SpectrumCloneV1.findOneAndUpdate({toolId : req.body.toolId, spectrumId : req.body.spectrumId}, update, {
             new: true,
             upsert: true // Make this update into an upsert
-          });
+        });
           
         res.send(spectrum);
     } catch (error) {

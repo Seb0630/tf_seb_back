@@ -33,13 +33,12 @@ exports.words = async function(req, res) {
             else{
                 if(firstLetter !== ''){
                     filter = {
-                        word : {$nin : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        word : { $regex: '^' + firstLetter, $options: 'i'},
                         count : {$gte : 3}
                     };
                 }
                 else{
                     filter = {
-                        word : {$nin : wordsIndexed}, 
                         count : {$gte : 3}
                     };
                 }
@@ -65,13 +64,12 @@ exports.words = async function(req, res) {
             else{
                 if(firstLetter !== ''){
                     filter = {
-                        word : {$nin : wordsIndexed, $regex: '^' + firstLetter, $options: 'i'}, 
+                        word : { $regex: '^' + firstLetter, $options: 'i'}, 
                         count : {$gte : 3}
                     };
                 }
                 else{
                     filter = {
-                        word : {$nin : wordsIndexed}, 
                         count : {$gte : 3}
                     }; 
                 }
@@ -81,9 +79,10 @@ exports.words = async function(req, res) {
         }
         
         let result = ms.map(function(entry){
+            let _isIndexed = wordsIndexed.findIndex(w => w === entry.word);
             let record = {
                 'count' : entry.count,
-                'indexed' : isIndexed? "Yes" : "",
+                'indexed' : (_isIndexed !== -1)? "Yes" : "",
                 'word' : entry.word
             }
             return record;
