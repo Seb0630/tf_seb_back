@@ -43,7 +43,7 @@ exports.labels = async function(req, res) {
                         spectrumId : label_obj.spectrumId,
                         label : entry,
                         position : -100,
-                        formattedLabel : entry + " (-100)"
+                        formattedLabel : entry + " (--)"
                     }
                 }
                 if(i === 2){
@@ -51,7 +51,7 @@ exports.labels = async function(req, res) {
                         spectrumId : label_obj.spectrumId,
                         label : entry,
                         position : -50,
-                        formattedLabel : entry + " (-50)"
+                        formattedLabel : entry + " (-)"
                     }
                 }
                 if(i === 3){
@@ -59,7 +59,7 @@ exports.labels = async function(req, res) {
                         spectrumId : label_obj.spectrumId,
                         label : entry,
                         position : 100,
-                        formattedLabel : entry + " (100)"
+                        formattedLabel : entry + " (++)"
                     }
                 }
                 if(i === 4){
@@ -67,7 +67,7 @@ exports.labels = async function(req, res) {
                         spectrumId : label_obj.spectrumId,
                         label : entry,
                         position : 50,
-                        formattedLabel : entry + " (50)"
+                        formattedLabel : entry + " (+)"
                     }
                 }
 

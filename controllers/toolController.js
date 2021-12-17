@@ -20,7 +20,7 @@ exports.create = async function(req, res) {
         let tool = await Tool.findOneAndUpdate({toolId : req.body.toolId}, update, {
             new: true,
             upsert: true // Make this update into an upsert
-          });
+        });
           
         res.send(tool);
     } catch (error) {
