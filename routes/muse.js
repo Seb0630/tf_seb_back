@@ -7,6 +7,9 @@ var muse_controller = require('../controllers/museController');
 router.post('/words', muse_controller.words);
 router.get('/word/:word_content/create', muse_controller.create);
 router.get('/word/:word_content/delete', muse_controller.delete);
+router.get('/groupwords/:groupId', muse_controller.groupwords);
+router.get('/groups', muse_controller.groups);
+router.post('/updateGroup', muse_controller.updateGroup);
 
 
 module.exports = router;
