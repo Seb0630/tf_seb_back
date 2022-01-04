@@ -103,7 +103,7 @@ exports.words = async function (req, res) {
 
 exports.groups = async function(req, res){
     try {
-        const groups = await Group.find({}).lean();
+        const groups = await Group.find({}).sort({'groupName' : 1}).lean();
         res.send(groups);
     }
     catch (error) {
@@ -145,18 +145,31 @@ exports.groupwords = async function (req, res) {
         const groupWords = group[0].words;
         const groupName = group[0].groupName;
 
+        const _words = await Word.find({}, { _id: 0, wordContent: 1 }).lean();
+        const wordsIndexed = _words.map(w => w.wordContent);
+
         const result = await Word.aggregate([ 
             {
                 $match : { wordContent : { $in : groupWords}}
             },
             { $project : {items : {$concatArrays: ["$relatedWordsGoogle", "$relatedWordsWiki"]}}},
             { $unwind : "$items"}, 
-            { $group: {_id : "$items.word", count : {$sum: 1} }}]).limit(5000).sort({count: -1});
+            { $group: {_id : "$items.word", total_score : {$sum : "$items.score"},  count : {$sum: 1} }}]).limit(5000).sort({total_score: -1});
 
-        let words = result.map(x => ({word : x._id, count : x.count}));
+        let words = result.map(function (entry) {
+            let _isIndexed = wordsIndexed.findIndex(w => w === entry._id);
+            let record = {
+                'count': entry.count,
+                'indexed': (_isIndexed !== -1) ? "Yes" : "",
+                'totalscore' : entry.total_score,
+                'word': entry._id
+            }
+            return record;
+        });
         
         let response = {
             groupName : groupName,
+            groupWords : groupWords,
             words: words
         };
 
