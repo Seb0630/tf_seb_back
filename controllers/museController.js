@@ -142,7 +142,8 @@ exports.groupwords = async function (req, res) {
     try {
         const groupId = req.params.groupId;
         const group = await Group.find({ _id: groupId}).lean();
-        const groupWords = group[0].words;
+        const _groupWords = group[0].words;
+        const groupWords = group[0].words.map(ele => ele.word);
         const groupName = group[0].groupName;
 
         const _words = await Word.find({}, { _id: 0, wordContent: 1 }).lean();
@@ -169,7 +170,7 @@ exports.groupwords = async function (req, res) {
         
         let response = {
             groupName : groupName,
-            groupWords : groupWords,
+            groupWords : _groupWords,
             words: words
         };
 
