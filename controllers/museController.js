@@ -101,9 +101,58 @@ exports.words = async function (req, res) {
     }
 };
 
+exports.checkindexed = async function(req, res){
+    try {
+        const word = req.body.word;
+        let indexResult = null;
+        await Word.findOne({wordContent : word}, function (err, result) {
+            if (!result) {
+                // do stuff here
+                indexResult = 'notIndexed';
+            }
+        });
+
+        await Stats.findOne({word : word}, function(err, result){
+            if (result) {
+                indexResult = 'wordinstats';
+            }
+        });
+
+        res.send(indexResult)
+    }
+    catch (error) {
+        res.status(500).send(error);
+    } 
+}
+
+exports.grouplist = async function(req, res){
+    try {
+        const groups = await Group.aggregate([
+            { $unwind : {path:'$words'}}, 
+            { $match : { 'words.color' : 'green'}},
+            { $group : {_id : "$alpha",   words : {$addToSet: '$words'} }},
+        ]).sort({'_id' : 1});
+
+        let filtered = groups.map(function(group){
+            let firstLetter = group._id.toLowerCase();
+            let _words = group.words.filter(x => x.word.charAt(0) === firstLetter);
+
+            let _group = {
+                _id : group._id , words : _words
+            };
+            return _group;
+        });
+
+        res.send(filtered);
+    }
+    catch (error) {
+        res.status(500).send(error);
+    } 
+}
+
 exports.groups = async function(req, res){
     try {
-        const groups = await Group.find({}).sort({'groupName' : 1}).lean();
+        const groups = await Group.find({}).sort({'alpha' : 1}).lean();
         res.send(groups);
     }
     catch (error) {
@@ -118,7 +167,9 @@ exports.updateGroup = async function(req, res){
 
         let update = {
             groupName : groupName, 
-            words : words
+            words : words,
+            sign : req.body.sign,
+            alpha : req.body.alpha
         };
 
         let query = {_id : req.body._id};
@@ -129,7 +180,7 @@ exports.updateGroup = async function(req, res){
         let group = await Group.findOneAndUpdate(query, update, {
             new: true,
             upsert: true // Make this update into an upsert
-          });
+        });
           
         res.send(group);
     }
@@ -145,6 +196,8 @@ exports.groupwords = async function (req, res) {
         const _groupWords = group[0].words;
         const groupWords = group[0].words.map(ele => ele.word);
         const groupName = group[0].groupName;
+        const sign = group[0].sign;
+        const alpha = group[0].alpha;
 
         const _words = await Word.find({}, { _id: 0, wordContent: 1 }).lean();
         const wordsIndexed = _words.map(w => w.wordContent);
@@ -171,7 +224,9 @@ exports.groupwords = async function (req, res) {
         let response = {
             groupName : groupName,
             groupWords : _groupWords,
-            words: words
+            words: words,
+            sign :  sign,
+            alpha : alpha
         };
 
         res.send(response);

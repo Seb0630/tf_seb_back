@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 // create new Schema for Group
 const GroupSchema = new mongoose.Schema({
+  sign : String,
+  alpha : String,
   groupName : String,
   words: Array
 },{
