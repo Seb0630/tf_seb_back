@@ -280,7 +280,7 @@ async function getStatsByWord(wordIndexed) {
 
         statsObjArray.push(obj);
     });
-    statsObjArray.sort((a, b) => parseInt(b.count) - parseInt(a.count));
+    statsObjArray.sort((a, b) => parseInt(b.totalScore) - parseInt(a.totalScore));
     return statsObjArray;
 }
 
