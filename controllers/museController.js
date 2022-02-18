@@ -272,6 +272,7 @@ async function getStatsByWord(wordIndexed) {
             count: entry.count,
             googleScore: google_score,
             wikiScore: wiki_score,
+            totalScore : parseInt(google_score) + parseInt(wiki_score),
             googleIndexed: moment(wordIndexed.createdAt).format("YYYY-MM-DD HH:mm"),
             wikiIndexed: moment(wordIndexed.createdAt).format("YYYY-MM-DD HH:mm"),
             isIndexed: isIndexed
