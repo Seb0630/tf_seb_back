@@ -252,9 +252,11 @@ async function getStatsByWord(wordIndexed) {
         let searched_wiki = (wordIndexed.relatedWordsWiki).find(w => w.word === entry.word);
         let google_score = null;
         let wiki_score = null;
+        let totalScore = 0;
 
         if (typeof searched_google !== 'undefined') {
             google_score = searched_google.score;
+            totalScore += google_score;
         }
         else {
             google_score = '';
@@ -262,6 +264,7 @@ async function getStatsByWord(wordIndexed) {
 
         if (typeof searched_wiki !== 'undefined') {
             wiki_score = searched_wiki.score;
+            totalScore += wiki_score;
         }
         else {
             wiki_score = '';
@@ -272,7 +275,7 @@ async function getStatsByWord(wordIndexed) {
             count: entry.count,
             googleScore: google_score,
             wikiScore: wiki_score,
-            totalScore : parseInt(google_score) + parseInt(wiki_score),
+            totalScore : totalScore,
             googleIndexed: moment(wordIndexed.createdAt).format("YYYY-MM-DD HH:mm"),
             wikiIndexed: moment(wordIndexed.createdAt).format("YYYY-MM-DD HH:mm"),
             isIndexed: isIndexed
