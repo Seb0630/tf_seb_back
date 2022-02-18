@@ -127,19 +127,56 @@ exports.checkindexed = async function(req, res){
 
 exports.grouplist = async function(req, res){
     try {
+        const groupsMock = [
+            { _id : 'A',words : []},
+            { _id : 'B',words : []},
+            { _id : 'C',words : []},
+            { _id : 'D',words : []},
+            { _id : 'E',words : []},
+            { _id : 'F',words : []},
+            { _id : 'G',words : []},
+            { _id : 'H',words : []},
+            { _id : 'I',words : []},
+            { _id : 'J',words : []},
+            { _id : 'K',words : []},
+            { _id : 'L',words : []},
+            { _id : 'M',words : []},
+            { _id : 'N',words : []},
+            { _id : 'O',words : []},
+            { _id : 'P',words : []},
+            { _id : 'Q',words : []},
+            { _id : 'R',words : []},
+            { _id : 'S',words : []},
+            { _id : 'T',words : []},
+            { _id : 'U',words : []},
+            { _id : 'V',words : []},
+            { _id : 'W',words : []},
+            { _id : 'X',words : []},
+            { _id : 'Y',words : []},
+            { _id : 'Z',words : []}
+        ];
+
         const groups = await Group.aggregate([
             { $unwind : {path:'$words'}}, 
             { $match : { 'words.color' : 'green'}},
             { $group : {_id : "$alpha",   words : {$addToSet: '$words'} }},
         ]).sort({'_id' : 1});
-
-        let filtered = groups.map(function(group){
+      
+        let filtered = groupsMock.map(function(group){
             let firstLetter = group._id.toLowerCase();
-            let _words = group.words.filter(x => x.word.charAt(0) === firstLetter);
+            let threadGroup = groups.find(g => g._id === group._id);
 
-            let _group = {
-                _id : group._id , words : _words
-            };
+            let _group = null;
+            if(threadGroup){
+                let _words = threadGroup.words.filter(x => x.word.charAt(0) === firstLetter);
+                _group = {
+                    _id : group._id , words : _words
+                };
+            }
+            else{
+                _group = group; 
+            }
+           
             return _group;
         });
 
